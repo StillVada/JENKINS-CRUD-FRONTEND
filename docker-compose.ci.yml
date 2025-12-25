@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Jenkins для локального тестирования
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: crud-app-jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - JENKINS_OPTS=--httpPort=8080
+    networks:
+      - crud-network
+
+  # Nginx для обслуживания собранного приложения
+  nginx:
+    image: nginx:alpine
+    container_name: crud-app-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - app_build:/usr/share/nginx/html
+    depends_on:
+      - jenkins
+    networks:
+      - crud-network
+
+  # Node.js для локального тестирования сборки
+  node:
+    image: node:18-alpine
+    container_name: crud-app-node
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules:/app/crud-app/node_modules
+    command: sh -c "cd crud-app && npm ci && npm run build -- --configuration production"
+    networks:
+      - crud-network
+
+volumes:
+  jenkins_home:
+  app_build:
+  node_modules:
+
+networks:
+  crud-network:
+    driver: bridge

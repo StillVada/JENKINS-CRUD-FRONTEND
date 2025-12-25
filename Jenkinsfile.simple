@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS' // Убедитесь, что NodeJS tool настроен в Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('crud-app') {
+                    sh 'npm ci'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('crud-app') {
+                    sh 'npm run build -- --configuration production'
+                }
+            }
+        }
+
+        stage('Archive Build') {
+            steps {
+                sh 'tar -czf crud-app-build.tar.gz crud-app/dist/'
+                archiveArtifacts artifacts: 'crud-app-build.tar.gz', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
