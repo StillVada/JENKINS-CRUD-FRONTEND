@@ -1,0 +1,16 @@
+{
+  "/api/Products": {
+    "target": "https://localhost:51724",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "rejectUnauthorized": false
+  },
+  "/api/Products/*": {
+    "target": "https://localhost:51724",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "rejectUnauthorized": false
+  }
+}

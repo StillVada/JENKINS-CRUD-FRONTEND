@@ -1,0 +1,48 @@
+<div class="product-list-container">
+  <div class="header">
+    <h1>Products</h1>
+    <button class="btn btn-primary" (click)="onCreateProduct()">Add New Product</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading products...</div>
+  } @else if (error()) {
+    <div class="error">
+      <p>Error: {{ error() }}</p>
+      <button class="btn btn-secondary" (click)="loadProducts()">Retry</button>
+    </div>
+  } @else {
+    @if (products().length === 0) {
+      <div class="empty-state">
+        <p>No products found.</p>
+        <button class="btn btn-primary" (click)="onCreateProduct()">Create First Product</button>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of products(); track product.id) {
+          <div class="product-card">
+            <div class="product-header">
+              <h3>{{ product.name }}</h3>
+              <div class="product-actions">
+                <button class="btn btn-sm btn-outline" (click)="onEditProduct(product)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="onDeleteProduct(product)">Delete</button>
+              </div>
+            </div>
+
+            <div class="product-body">
+              <p class="description">{{ product.description }}</p>
+              <p class="price">{{ formatPrice(product.price) }}</p>
+            </div>
+
+            <div class="product-footer">
+              <small class="date-info">
+                Created: {{ formatDate(product.createdAt) }}<br>
+                Updated: {{ formatDate(product.updatedAt) }}
+              </small>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
